@@ -4,17 +4,20 @@ shopt -s extglob
 
 SHELL_FOLDER=$(dirname $(readlink -f "$0"))
 
-git_clone_path master https://github.com/coolsnowwolf/lede target/linux/generic/hack-6.1
+bash $SHELL_FOLDER/../common/kernel_6.1.sh
 
-rm -rf target/linux/qualcommax/!(Makefile) package/kernel/qca-* package/boot/uboot-envtools package/firmware/ipq-wifi
-git_clone_path master https://github.com/coolsnowwolf/lede target/linux/qualcommax
-git_clone_path master https://github.com/coolsnowwolf/lede package/qca
-git_clone_path master https://github.com/coolsnowwolf/lede package/boot/uboot-envtools
-git_clone_path master https://github.com/coolsnowwolf/lede package/firmware/ipq-wifi
+rm -rf target/linux/qualcommax target/linux/generic/!(*-5.15) package/kernel/qca-* package/kernel/mac80211 devices/common/patches/qca-ssdk.patch package/boot/uboot-envtools package/firmware/ipq-wifi
+git_clone_path master https://github.com/coolsnowwolf/lede target/linux/qualcommax package/firmware/ipq-wifi package/boot/uboot-envtools package/qca
 
-rm -rf package/feeds/kiddin9/quectel_Gobinet devices/common/patches/kernel_version.patch devices/common/patches/rootfstargz.patch target/linux/generic/hack-6.1/{410-block-fit-partition-parser.patch,724-net-phy-aquantia*,720-net-phy-add-aqr-phys.patch}
+git_clone_path master https://github.com/coolsnowwolf/lede mv target/linux/generic
 
-curl -sfL https://raw.githubusercontent.com/coolsnowwolf/lede/master/target/linux/generic/pending-6.1/613-netfilter_optional_tcp_window_check.patch -o target/linux/generic/pending-6.1/613-netfilter_optional_tcp_window_check.patch
+git_clone_path c640f7b93736621b4d56627e4f6ab824093f9c3d https://github.com/openwrt/openwrt package/kernel/mac80211
+
+wget -N https://github.com/coolsnowwolf/lede/raw/master/include/kernel-6.1 -P include/
+
+sed -i "s/wpad-openssl/wpad-basic-mbedtls/" target/linux/qualcommax/Makefile
+
+sed -i "s/OpenWrt/Kwrt/g" package/base-files/files/bin/config_generate package/base-files/image-config.in config/Config-images.in Config.in include/u-boot.mk include/version.mk package/network/config/wifi-scripts/files/lib/wifi/mac80211.sh || true
 
 
 
